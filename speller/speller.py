@@ -43,21 +43,29 @@ class Word(Speller):
 
     @property
     def variants(self):
+        if self.correct:
+            return
         return self.answer[0]['s']
 
     @property
     def spellsafe(self):
+        if self.correct:
+            return
         return self.variants[0]
+
 
 class Text(Speller):
 
     @property
     def spellsafe(self):
-        changes = {}
-    
+        changes = {el['word']: el['s'][0] for el in self.answer}
+        result = self.text
+        for wrong, fixed in changes.iteritems():
+            result = result.replace(wrong, fixed)
+        return result
 
+    @property
+    def errors(self):
+        return [el['word'] for el in self.answer]
 
-# print Speller('lol').check()
-# print Speller('рупь дубь').correct
-print Word('emphasize').correct
-# print Word('lest').variants
+print Text('42 is a cUl maagic namber').spellsafe
